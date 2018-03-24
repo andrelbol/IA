@@ -3,6 +3,7 @@ class Node:
     def __init__(self, value, heuristic):
         self.value = value
         self.heuristic = heuristic
+        self.already_walked = 0
 
     def get_avaiable_transitions(self, transitions):
         result = []
