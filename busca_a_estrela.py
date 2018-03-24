@@ -1,28 +1,5 @@
-class Node:
-
-    def __init__(self, value, heuristic):
-        self.value = value
-        self.heuristic = heuristic
-
-    def get_adjacent_nodes_transitions(self, transitions):
-        result = []
-        for transition in transitions:
-            if(transition.current.value == self.value):
-                result.append(transition)
-        return result
-
-    def __str__(self):
-        return self.value
-
-class Transition:
-
-    def __init__(self, current, to, weight):
-        self.current = current
-        self.to = to
-        self.weight = weight
-
-    def __str__(self):
-        return "From: " + self.current.value + ", To: " + self.to.value + ", weight: " + str(self.weight)
+from model.Transition import Transition
+from model.Node import Node
 
 def setup_nodes():
     nodes = []
@@ -37,9 +14,8 @@ def get_node_by_value(value, nodes):
         if(node.value == value):
             return node
 
-def setup_initial_transitions():
+def setup_initial_transitions(nodes):
     transitions = []
-    nodes = setup_nodes()
 
     transitions.append(Transition(get_node_by_value("Arad", nodes), get_node_by_value("Zerind", nodes), 75))
     transitions.append(Transition(get_node_by_value("Zerind", nodes), get_node_by_value("Arad", nodes), 75))
@@ -48,10 +24,48 @@ def setup_initial_transitions():
 
     return transitions
 
+def test_objective(current_node, nodes):
+    objective = get_node_by_value("Bucharest", nodes)
+    return current_node == objective
+
+def get_shortest_transition(transitions):
+    best_transition = learned_transitions[0]
+    for transition in learned_transitions:
+        if(best_transition.weight > transition.weight):
+            best_transition = transition
+    return best_transition
+
+def step(current_node, already_walked, learned_transitions):
+    node_avaiable_transitions = current_node.get_avaiable_transitions()
+    for transition in node_avaiable_transitions:
+        aux_transition = transition
+        aux_transition.weight += (already_walked + aux_transition.to.heuristic)
+        learned_transitions.append(aux_transition)
+    
+    next_transition = get_shortest_transition(learned_transitions)
+    current_node = next_transition.to
+    already_walked += (next_transition.weight - next_transition.to.heuristic) # Heuristic doesn't count in way already walked
+    learned_transitions.remove(next_transition) # Remove so it doesn't count in next iteration
+    # TODO(@andre): finish this function and test it
+    
+
+
+    
+
+
+
 def main():
-    transitions = setup_initial_transitions()
-    for t in transitions:
-        print(t)
-    return True
+    nodes = setup_nodes()
+    transitions = setup_initial_transitions(nodes)
+    learned_transitions = []
+    already_walked = 0
+
+    # Start at Arad
+    current_node = get_node_by_value("Arad", nodes)
+
+    # while(not(test_objective(current_node, nodes))):
+    #     current_node = step()
+    #     return True
+    
 
 main()
