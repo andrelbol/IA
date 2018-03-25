@@ -27,7 +27,7 @@ def main():
     walked_transitions = []
 
     # Start at Arad
-    current_node = Node.get_node_by_value("Arad", nodes)
+    current_node = Node.get_node_by_value("Lugoj", nodes)
 
     # Steps
     while(not(objective_function(current_node, nodes))):

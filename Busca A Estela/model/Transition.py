@@ -28,4 +28,9 @@ class Transition:
             print(transition)
 
     def __str__(self):
-        return "From: " + self.current.value + ", To: " + self.to.value + ", weight: " + str(self.weight)
+        FROM = self.current.value
+        TO = self.to.value
+        F_VAL = str(self.weight)
+        G_VAL = str(self.weight - self.to.heuristic)
+        H_VAL = str(self.to.heuristic)
+        return "From: " + FROM + ", To: " + TO + ", f: " + F_VAL + ", g: " + G_VAL + ", h: " + H_VAL
