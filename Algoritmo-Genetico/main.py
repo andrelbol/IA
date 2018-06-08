@@ -1,72 +1,105 @@
 import math, random
 import numpy as np
+import matplotlib.pyplot as plt
 
-def objective_function(*args):
-  x1 = args[0]
-  x2 = args[1]
-  func = -(x2 + 47)*math.sin(math.sqrt(abs(x2 + x1/2 + 47))) - x1*math.sin(math.sqrt(abs(x1 - (x2 + 47))))
-  return -1*func + 1500
+class GeneticAlgorithm:
 
-def select_one_chrom_index(population_fitness, total_sum):
-  random_number = random.uniform(0, total_sum)
-  fitness_sum = 0
-  for i in range(0, population_fitness.shape[0]):
-    fitness_sum += population_fitness[i]
-    if(fitness_sum >= random_number):
-      return i
+  def __init__(self):
+    self.population = self.generate_population()
+    self.population_count = self.population.shape[0]
+    self.population_size = self.population.shape[1]
+    self.mutation_rate = 0.1
+    self.number_of_generations = 100
 
-def generate_population():
-  population = np.random.randint(600, size=(100, 2))
-  return population 
+  def objective_function(self, *args):
+    x1 = args[0]
+    x2 = args[1]
+    func = -(x2 + 47)*math.sin(math.sqrt(abs(x2 + x1/2 + 47))) - x1*math.sin(math.sqrt(abs(x1 - (x2 + 47))))
+    return -1*func + 1500
 
-def select(population):
-  population_count = population.shape[0]
-  population_size = population.shape[1]
-  population_fitness = np.zeros([population_count])
-  new_population = np.zeros([population_count, population_size])
+  def get_best_evaluate(self):
+    value = 0
+    for i in range(0, self.population_count):
+      new_value = self.objective_function(*self.population[i])
+      if(new_value > value):
+        value = new_value
+    return value
 
-  total_sum = 0
-  for i in range(0, population_count):
-    fitness = objective_function(*population[i])
-    population_fitness[i] = fitness
-    total_sum += fitness
+  def get_generation_medium(self):
+    medium = 0
+    for i in range(0, self.population_count):
+      medium += self.objective_function(*self.population[i])
+    medium /= self.population_count
+    return medium
 
-  for i in range(0, population_count):
-    index = select_one_chrom_index(population_fitness, total_sum)
-    new_population[i] = population[index]
+  def select_one_chrom_index(self, population_fitness, total_sum):
+    random_number = random.uniform(0, total_sum)
+    fitness_sum = 0
+    for i in range(0, population_fitness.shape[0]):
+      fitness_sum += population_fitness[i]
+      if(fitness_sum >= random_number):
+        return i
 
-  return new_population
+  def generate_population(self):
+    population = np.random.randint(600, size=(100, 2))
+    return population
 
-# TODO(@andre-luis): Perguntar em qual momento colocar isso
-def evaluate(population):
-  pass
+  def select(self):
+    population_fitness = np.zeros([self.population_count])
+    new_population = np.zeros([self.population_count, self.population_size])
 
-def crossover(population):
-  population_count = population.shape[0]
-  population_size = population.shape[1]
-  population_half = math.floor(population_count/2)
-  new_population = np.zeros([population_count, population_size])
-  alpha = random.uniform(0.25, 1.25)
-  for i in range(0, population_half):
-    first = population[i]
-    second = population[i+population_half]
-    for j in range(0, population_size):
-      new_population[i][j] = alpha*first[j] + (1 - alpha)*second[j]
-      new_population[i+population_half][j] = alpha*second[j] + (1 - alpha)*first[j]
+    # Calculating objetctive function results
+    total_sum = 0
+    for i in range(0, self.population_count):
+      fitness = self.objective_function(*self.population[i])
+      population_fitness[i] = fitness
+      total_sum += fitness
 
-  return new_population
+    #
+    for i in range(0, self.population_count):
+      index = self.select_one_chrom_index(population_fitness, total_sum)
+      new_population[i] = self.population[index]
 
-# TODO(@andre-luis): Perguntar se realmente é necessário transformar para binário para mutar 
-def mutate(population):
-  pass
+    self.population =  new_population
 
-def main():
-  population = generate_population()
-  for i in range(0, 1000):
-    population = crossover(population)
-    population = select(population)
-  print(population)
-  return
-  
+  def crossover(self):
+    population_half = math.floor(self.population_count/2)
+    new_population = np.zeros([self.population_count, self.population_size])
+    alpha = random.uniform(0.25, 1.25)
+    for i in range(0, population_half):
+      first = self.population[i]
+      second = self.population[i+population_half]
+      for j in range(0, self.population_size):
+        new_population[i][j] = alpha*first[j] + (1 - alpha)*second[j]
+        new_population[i+population_half][j] = alpha*second[j] + (1 - alpha)*first[j]
 
-main()
+    self.population = new_population
+
+  def mutate(self):
+    b = random.gauss(0, 1)
+    for i in range(0, self.population_count):
+      if(random.gauss(0, 1) < self.mutation_rate):
+        for j in range(0, self.population_size):
+          self.population[i][j] += self.population[i][j]*b*0.05
+
+
+  def run(self):
+    best_offspring_array = []
+    medium_array = []
+    for i in range(0, self.number_of_generations):
+      self.select()
+      self.crossover()
+      self.mutate()
+      best_offspring_array.append(self.get_best_evaluate())
+      medium_array.append(self.get_generation_medium())
+    print(self.population)
+    return best_offspring_array, medium_array
+
+
+ag = GeneticAlgorithm()
+value_array, medium_array = ag.run()
+desired_array = []
+for i in range(0, ag.population_count):
+    desired_array.append(1500 - 959.6407)
+plt.plot(range(0, ag.population_count), value_array, 'r--', range(0, ag.population_count), medium_array, 'b--', range(0, ag.population_count), desired_array, 'g--')
+plt.show()
