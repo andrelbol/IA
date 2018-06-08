@@ -8,8 +8,8 @@ class GeneticAlgorithm:
     self.population = self.generate_population()
     self.population_count = self.population.shape[0]
     self.population_size = self.population.shape[1]
-    self.mutation_rate = 0.1
-    self.number_of_generations = 100
+    self.mutation_rate = 0.01
+    self.number_of_generations = 1000
 
   def objective_function(self, *args):
     x1 = args[0]
@@ -32,10 +32,10 @@ class GeneticAlgorithm:
     medium /= self.population_count
     return medium
 
-  def select_one_chrom_index(self, population_fitness, total_sum):
+  def select_one_chromossome_index(self, population_fitness, total_sum):
     random_number = random.uniform(0, total_sum)
     fitness_sum = 0
-    for i in range(0, population_fitness.shape[0]):
+    for i in range(0, self.population_count):
       fitness_sum += population_fitness[i]
       if(fitness_sum >= random_number):
         return i
@@ -57,7 +57,7 @@ class GeneticAlgorithm:
 
     #
     for i in range(0, self.population_count):
-      index = self.select_one_chrom_index(population_fitness, total_sum)
+      index = self.select_one_chromossome_index(population_fitness, total_sum)
       new_population[i] = self.population[index]
 
     self.population =  new_population
@@ -99,7 +99,8 @@ class GeneticAlgorithm:
 ag = GeneticAlgorithm()
 value_array, medium_array = ag.run()
 desired_array = []
-for i in range(0, ag.population_count):
-    desired_array.append(1500 - 959.6407)
-plt.plot(range(0, ag.population_count), value_array, 'r--', range(0, ag.population_count), medium_array, 'b--', range(0, ag.population_count), desired_array, 'g--')
+for i in range(0, ag.number_of_generations):
+    desired_array.append(1500 + 959.6407)
+t = range(0, ag.number_of_generations)
+plt.plot(t, value_array, 'r--', t, medium_array, 'b--', t, desired_array, 'g--')
 plt.show()
