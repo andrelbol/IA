@@ -1,10 +1,16 @@
 import math
 import numpy as np
+from model.Individual import Individual
 
-def objective_function(pi):
-  x1 = pi[0]
-  x2 = pi[1]
+def objective_function(*args):
+  x1 = args[0]
+  x2 = args[1]
   return -(x2+47)*math.sin(math.sqrt(math.abs(x2+(x1/2)+47))) - x1*math.sin(math.sqrt(math.abs(x1-(x2+47))));
+
+def generate_initial_population():
+  pass
+
+
 
 def initialize():
   population = np.random.randint(600,size=(100,2))
@@ -26,12 +32,16 @@ def eval(P):
 
 
 def select(P, n1, f):
-
+  pass
 
 def clone(P1, f):
-
+  pass
 
 def mutate(P1, f):
-
+  pass
 
 def replace(P, n2):
+  pass
+
+def main():
+  pass
