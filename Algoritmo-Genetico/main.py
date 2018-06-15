@@ -9,7 +9,7 @@ class GeneticAlgorithm:
     self.population_count = self.population.shape[0]
     self.population_size = self.population.shape[1]
     self.mutation_rate = 0.01
-    self.number_of_generations = 1000
+    self.number_of_generations = 500
 
   def objective_function(self, *args):
     x1 = args[0]
@@ -41,7 +41,7 @@ class GeneticAlgorithm:
         return i
 
   def generate_population(self):
-    population = np.random.randint(600, size=(100, 2))
+    population = np.random.randint(512, size=(100, 2))
     return population
 
   def select(self):
@@ -100,7 +100,7 @@ ag = GeneticAlgorithm()
 value_array, medium_array = ag.run()
 desired_array = []
 for i in range(0, ag.number_of_generations):
-    desired_array.append(1500 + 959.6407)
+    desired_array.append(ag.objective_function(512, 404.2319))
 t = range(0, ag.number_of_generations)
 plt.plot(t, value_array, 'r--', t, medium_array, 'b--', t, desired_array, 'g--')
 plt.show()
