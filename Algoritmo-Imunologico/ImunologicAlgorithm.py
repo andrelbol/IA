@@ -5,12 +5,20 @@ from functools import reduce
 import matplotlib.pyplot as plt
 
 # Restrições
-max_iterations = 50;
-population_size = 100;
-selection_size = 50;
-clone_rate = 5; 
-mutation_increment = 0.2;
-mutation_rate = 0.2;
+MAX_ITERATIONS = 50;
+POPULATION_SIZE = 100;
+SELECTION_SIZE = 50;
+CLONE_RATE = 5; 
+MUTATION_INCREMENT = 0.2;
+MUTATION_RATE = 0.2;
+COORDS_MIN = -600
+COORDS_MAX = 600
+
+# Funções utilitárias
+# Se estiver no limite, joga pro meio de novo (COORDS_MAX/2 é só um valor médio pra modificar)
+limit_max = lambda x: x if x < COORDS_MAX else x - COORDS_MAX/2
+limit_min = lambda x: x if x > COORDS_MIN else x + COORDS_MAX/2
+reduce_sum_func = lambda prev,curr: prev + objective_function(*curr)
 
 # Função Objetivo
 def objective_function(*args):
@@ -22,16 +30,10 @@ def objective_function(*args):
 class ImunologicAlgorithm:
   
   def __init__(self):
-    self.population = np.random.randint(600,size=(population_size,2))
+    self.population = np.random.randint(600,size=(POPULATION_SIZE,2))
     self.population_fitness = []
     self.best_array = []
     self.medium_array = []
-
-  def evaluate(self):
-    fitness_array = []
-    for individual in self.population:
-      fitness_array.append(objective_function(individual))
-    self.population_fitness = fitness_array
 
   def select(self):
     # Sort by affinity
@@ -40,12 +42,12 @@ class ImunologicAlgorithm:
       key=lambda individual: objective_function(*individual),
       reverse=True
     )
-    self.population = reverse_sorted_population[:selection_size]
+    self.population = reverse_sorted_population[:SELECTION_SIZE]
 
   def clone(self):
     cloned_population = []
     for individual in self.population:
-      cloned_population.extend([individual for i in range(0, clone_rate)]) 
+      cloned_population.extend([individual for i in range(0, CLONE_RATE)]) 
     self.population = cloned_population
 
   def mutate(self):
@@ -56,27 +58,30 @@ class ImunologicAlgorithm:
 
   def __mutate(self, individual):
     b = random.gauss(-1, 1)
-    if(random.gauss(0,1) < mutation_rate):
-      return [ (x + x*b*0.5) for x in individual]
-    else:
-      return list(individual)
+    increment = lambda x: x + x*b*MUTATION_INCREMENT
+    if(random.gauss(0,1) < MUTATION_RATE):
+      mutated_individual = [ increment(x) for x in individual]
+      mutated_individual = [ limit_max(x) for x in mutated_individual ]
+      mutated_individual = [ limit_min(x) for x in mutated_individual ]
+      return mutated_individual
+    return list(individual)
 
   def plot_results(self):
     t = range(0, len(self.best_array))
-    plt.plot(t, self.best_array, 'r--', t, self.medium_array, 'b--')
+    desired = [ objective_function(512, 404.2319) for i in t]
+    plt.plot(t, self.best_array, 'r--', t, self.medium_array, 'b--', t, desired, 'g--')
     plt.show()
 
   def run(self):
     best_array = []
     medium_array = []
-    reduce_sum_func = lambda prev,curr: prev + objective_function(*curr)
-    for t in range(0, max_iterations):
+    for t in range(0, MAX_ITERATIONS):
       self.select()
       self.clone()
       self.mutate()
       self.select()
       self.best_array.append(objective_function(*self.population[0]))
-      self.medium_array.append(reduce(reduce_sum_func, self.population)/selection_size)
+      self.medium_array.append(reduce(reduce_sum_func, self.population)/SELECTION_SIZE)
 
 # Execução
 ia = ImunologicAlgorithm()
