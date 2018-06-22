@@ -31,7 +31,6 @@ class ImunologicAlgorithm:
   
   def __init__(self):
     self.population = np.random.randint(600,size=(POPULATION_SIZE,2))
-    self.population_fitness = []
     self.best_array = []
     self.medium_array = []
 
