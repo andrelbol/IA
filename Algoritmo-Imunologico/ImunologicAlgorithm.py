@@ -31,7 +31,6 @@ class ImunologicAlgorithm:
   
   def __init__(self):
     self.population = np.random.randint(600,size=(POPULATION_SIZE,2))
-    self.population_fitness = []
     self.best_array = []
     self.medium_array = []
 
@@ -47,20 +46,17 @@ class ImunologicAlgorithm:
   def clone(self):
     cloned_population = []
     for individual in self.population:
-      cloned_population.extend([individual for i in range(0, CLONE_RATE)]) 
+      cloned_population.extend([ individual for i in range(0, CLONE_RATE) ]) 
     self.population = cloned_population
 
   def mutate(self):
-    mutated_population = []
-    for individual in self.population:
-      mutated_population.append(self.__mutate(individual))
-    self.population =  mutated_population
+    self.population = [ self.__mutate(individual) for individual in self.population ]
 
   def __mutate(self, individual):
     b = random.gauss(-1, 1)
     increment = lambda x: x + x*b*MUTATION_INCREMENT
     if(random.gauss(0,1) < MUTATION_RATE):
-      mutated_individual = [ increment(x) for x in individual]
+      mutated_individual = [ increment(x) for x in individual ]
       mutated_individual = [ limit_max(x) for x in mutated_individual ]
       mutated_individual = [ limit_min(x) for x in mutated_individual ]
       return mutated_individual
