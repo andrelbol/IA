@@ -26,6 +26,7 @@ beta.append([beta_calc_2(i) for i in inputx.values])
 beta.append([beta_calc_3(i) for i in inputx.values])
 beta.append([beta_calc_4(i) for i in inputx.values])
 
+
 inv_beta = pinv(np.array(beta))
 final_matrix = np.matmul(inv_beta.T, y)
 r1, r2, p1, p2  = final_matrix
@@ -43,5 +44,5 @@ def weighted_average(value):
 
 y_pred = [weighted_average(i) for i in inputx.values]
 
-plt.plot(inputx.values, y, inputx.values, y_pred)
+plt.plot(inputx.values, y_pred)
 plt.show()
