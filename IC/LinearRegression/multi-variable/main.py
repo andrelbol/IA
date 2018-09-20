@@ -1,13 +1,13 @@
 import matplotlib.pyplot as plt
 
-from model.Regression import Regression
+from models.Regression import Regression
 
 def main():
-  file_path = 'data/data.csv'
+  file_path = '../data/ex2data1.csv'
   regression = Regression(file_path, 0.01)
   plt.figure(1)
-  plt.xlabel('População da cidade (x10.000)')
-  plt.ylabel('Lucro em U$D(x10.000)')
+  plt.xlabel('Exam1 score')
+  plt.ylabel('Exam1 score')
   plt.scatter(regression.x, regression.y)
   costs = []
   for i in range(0, 2000):
